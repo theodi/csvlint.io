@@ -118,7 +118,7 @@ To embed a validation badge for a CSV, you can use the following HTML:
 
 ## Privacy Policy
 
-This service is privacy-focused and removes any identifiable information from validation reports. To view a detailed privacy policy, see [Privacy Policy](link-to-privacy-policy).
+This service is privacy-focused and removes any identifiable information from validation reports. To view a detailed privacy policy, see [Privacy Policy](https://csvlint.io/privacy).
 
 ## Contributing
 
