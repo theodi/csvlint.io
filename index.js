@@ -50,6 +50,13 @@ app.use(cors());
 app.use(express.static(__dirname + '/public')); // Public directory
 
 app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate'); // HTTP 1.1.
+  res.setHeader('Pragma', 'no-cache'); // HTTP 1.0.
+  res.setHeader('Expires', '0'); // Proxies.
+  next();
+});
+
+app.use((req, res, next) => {
   // Read package.json file
   fs.readFile(path.join(__dirname, 'package.json'), 'utf8', (err, data) => {
       if (err) {
@@ -151,17 +158,16 @@ app.get('/validate', async (req, res) => {
     }
 
     // Collect dialect options from the query params
-    const dialect = {
-      delimiter: req.query.delimiter,
-      doubleQuote: req.query.doubleQuote === 'true',
-      lineTerminator: req.query.lineTerminator,
-      nullSequence: req.query.nullSequence,
-      quoteChar: req.query.quoteChar,
-      escapeChar: req.query.escapeChar,
-      skipInitialSpace: req.query.skipInitialSpace === 'true',
-      header: req.query.header === 'true',
-      caseSensitiveHeader: req.query.caseSensitiveHeader === 'true',
-    };
+    const dialect = {};
+    if (req.query.delimiter) dialect.delimiter = req.query.delimiter;
+    if (req.query.doubleQuote) dialect.doubleQuote = req.query.doubleQuote === 'true';
+    if (req.query.lineTerminator) dialect.lineTerminator = req.query.lineTerminator;
+    if (req.query.nullSequence) dialect.nullSequence = req.query.nullSequence;
+    if (req.query.quoteChar) dialect.quoteChar = req.query.quoteChar;
+    if (req.query.escapeChar) dialect.escapeChar = req.query.escapeChar;
+    if (req.query.skipInitialSpace) dialect.skipInitialSpace = req.query.skipInitialSpace === 'true';
+    if (req.query.header) dialect.header = req.query.header === 'true';
+    if (req.query.caseSensitiveHeader) dialect.caseSensitiveHeader = req.query.caseSensitiveHeader === 'true';
 
     if (Object.keys(dialect).length > 0) {
       form.append('dialect', JSON.stringify(dialect));
@@ -301,7 +307,6 @@ app.post('/validate', upload.fields([{ name: 'file' }, { name: 'schema' }]), asy
       if (Object.keys(dialect).length > 0) {
         form.append('dialect', JSON.stringify(dialect));
       }
-
       // Send the form data to the Ruby server
       const response = await axios.post(CSVLINT_API, form, {
         headers: form.getHeaders(),

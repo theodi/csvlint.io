@@ -1,44 +1,124 @@
 <%- include('./partials/header') %>
 
 <section class="examples">
+  <style>
+    td {
+        vertical-align: middle;
+    }
+    td.result {
+        text-align: center;
+    }
+    .validationImg {
+        width: 150px;
+    }
+    .file-content {
+        margin-bottom: 1em;
+    }
+  </style>
   <h1>CSV Validation Examples</h1>
   <p>Below are some example CSV files demonstrating different validation scenarios. Each example shows the contents of the CSV file, the expected validation result, and a link to validate it. Click on the badge to view the validation results for each example.</p>
 
-  <h2>Example: Student List</h2>
-  <p>This example demonstrates a simple CSV file containing a list of students with their names and ages. The CSV file is expected to pass validation without errors.</p>
-
-  <!-- CSV File Preview -->
-  <h3>Contents of <code>students.csv</code></h3>
-  <pre id="file-content"><code>Loading file content...</code></pre>
-
-  <!-- Expected Result -->
-  <h3>Expected Result</h3>
-  <p>This CSV should validate successfully, as it is well-formed and contains consistent data types in each column. No errors or warnings are expected.</p>
-
-  <!-- Validation Badge Link -->
-  <h3>Validation Badge</h3>
-  <p>Click the badge below to view the validation results for this example:</p>
-  <a href="http://localhost:3080/validate?csvUrl=https://raw.githubusercontent.com/theodi/csvlint.io/refs/heads/main/public/examples/students.csv" target="_blank">
-    <img src="http://localhost:3080/validate?csvUrl=https://raw.githubusercontent.com/theodi/csvlint.io/refs/heads/main/public/examples/students.csv&format=svg" alt="Validation Badge for students.csv">
-  </a>
+  <!-- Table Structure for Examples -->
+  <table class="examples-table">
+    <thead>
+      <tr>
+        <th>Example</th>
+        <th>Contents</th>
+        <th>Expected Result</th>
+        <th>Actual Result</th>
+      </tr>
+    </thead>
+    <tbody id="examples-table-body">
+      <!-- JavaScript will populate this section -->
+    </tbody>
+  </table>
 </section>
 
 <script>
-  // JavaScript to fetch and display the file content
   document.addEventListener("DOMContentLoaded", function () {
-    fetch('https://raw.githubusercontent.com/theodi/csvlint.io/refs/heads/main/public/examples/students.csv')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.text();
-      })
-      .then(data => {
-        document.getElementById('file-content').textContent = data;
+    // Fetch the examples.json file from the server
+    fetch('/examples/examples.json')
+      .then(response => response.json())
+      .then(examples => {
+        const tableBody = document.getElementById('examples-table-body');
+
+        examples.forEach((example, index) => {
+          // Build the validation URL with dialect options if provided
+          const dialectParams = example.dialect ? `&${example.dialect}` : '';
+          const schemaParam = example.schemaUrl ? `&schemaUrl=${encodeURIComponent(example.schemaUrl)}` : '';
+          const validationUrl = `/validate?csvUrl=${encodeURIComponent(example.csvUrl)}${schemaParam}${dialectParams}`;
+
+          // Create table row
+          const row = document.createElement('tr');
+
+          // Example title and description
+          const exampleCell = document.createElement('td');
+          exampleCell.innerHTML = `<h3>${example.title}</h3><p>${example.description}</p>`;
+          row.appendChild(exampleCell);
+
+          // CSV and schema contents in the same cell
+          const contentCell = document.createElement('td');
+          contentCell.innerHTML = `
+            <div class="file-content">
+              <strong>CSV Content:</strong>
+              <pre id="file-content-${index}"><code>Loading CSV content...</code></pre>
+            </div>
+          `;
+          if (example.schemaUrl) {
+            /*contentCell.innerHTML += `
+              <div class="file-content">
+                <strong>Schema Content:</strong>
+                <pre id="schema-content-${index}"><code>Loading schema content...</code></pre>
+              </div>
+            `;*/
+          }
+          row.appendChild(contentCell);
+
+          // Expected result
+          const expectedResultCell = document.createElement('td');
+          expectedResultCell.textContent = example.expectedResult;
+          row.appendChild(expectedResultCell);
+
+          // Validation badge link
+          const actualResultCell = document.createElement('td');
+          actualResultCell.classList.add('result');
+          actualResultCell.innerHTML = `
+            <a href="${validationUrl}" target="_blank">
+              <img class="validationImg" src="${validationUrl}&format=svg" alt="Validation Badge for ${example.title}">
+            </a>
+          `;
+          row.appendChild(actualResultCell);
+
+          // Add the row to the table body
+          tableBody.appendChild(row);
+
+          // Fetch the CSV file content and display it
+          fetch(example.csvUrl)
+            .then(response => response.text())
+            .then(data => {
+              document.getElementById(`file-content-${index}`).textContent = data;
+            })
+            .catch(error => {
+              console.error('Error loading CSV content:', error);
+              document.getElementById(`file-content-${index}`).textContent = 'Error loading CSV content.';
+            });
+
+          // Fetch the schema file content if schemaUrl is defined
+          if (example.schemaUrl) {
+            fetch(example.schemaUrl)
+              .then(response => response.text())
+              .then(data => {
+                document.getElementById(`schema-content-${index}`).textContent = data;
+              })
+              .catch(error => {
+                console.error('Error loading schema content:', error);
+                document.getElementById(`schema-content-${index}`).textContent = 'Error loading schema content.';
+              });
+          }
+        });
       })
       .catch(error => {
-        console.error('There was a problem with the fetch operation:', error);
-        document.getElementById('file-content').textContent = 'Error loading file content.';
+        console.error('Error loading examples:', error);
       });
   });
 </script>
