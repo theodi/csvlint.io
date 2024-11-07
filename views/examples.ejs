@@ -18,15 +18,15 @@
   <!-- Validation Badge Link -->
   <h3>Validation Badge</h3>
   <p>Click the badge below to view the validation results for this example:</p>
-  <a href="http://localhost:3080/validate?csvUrl=http://localhost:3080/examples/students.csv" target="_blank">
-    <img src="http://localhost:3080/validate?csvUrl=http://localhost:3080/examples/students.csv&format=svg" alt="Validation Badge for students.csv">
+  <a href="http://localhost:3080/validate?csvUrl=https://raw.githubusercontent.com/theodi/csvlint.io/refs/heads/main/public/examples/students.csv" target="_blank">
+    <img src="http://localhost:3080/validate?csvUrl=https://raw.githubusercontent.com/theodi/csvlint.io/refs/heads/main/public/examples/students.csv&format=svg" alt="Validation Badge for students.csv">
   </a>
 </section>
 
 <script>
   // JavaScript to fetch and display the file content
   document.addEventListener("DOMContentLoaded", function () {
-    fetch('/examples/students.csv')
+    fetch('https://raw.githubusercontent.com/theodi/csvlint.io/refs/heads/main/public/examples/students.csv')
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
