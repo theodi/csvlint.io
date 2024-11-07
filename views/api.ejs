@@ -1,0 +1,124 @@
+<%- include('./partials/header') %>
+<section class="api-documentation">
+  <h1>CSVLint.io API Documentation</h1>
+
+  <p>The CSVLint API allows you to validate CSV files for structure and schema compliance. You can use this API to upload a file directly or provide a URL to a CSV and an optional schema. The API will return a JSON response with validation results if requested.</p>
+
+  <h2>Privacy and Validation Records</h2>
+  <p>CSVLint.io keeps a record of each validation report so it is possible to track service use and types of errors people are encountering. However, to ensure user privacy, all identifiable data is removed from these stored reports. This includes the URLs/filenames of the CSV and/or schema, as well as any content within these.</p>
+
+  <p>When you revisit a previously generated report by its ID (e.g., <code>/validation/&lt;id&gt;</code>), you will see a summary of the validation, but any identifiable information and in-depth details, such as specific content errors, are not available as we don't have them! For this reason, if you want to see the full validation detail, including error specifics and embed options, you must perform a new validation.</p>
+
+  <p>To prevent duplication, each validation report includes a one-way hash generated from the URLs of the CSV and schema files. This hash allows the service to detect if a validation for the same combination of URLs has been performed previously without retaining the actual URLs themselves. This privacy-preserving approach ensures we can keep track of usage without storing any identifable information.</p>
+
+  <p>This may seem risk averse, but it is done because many people will upload very sensitive data to publicly accessible locations and we do not want a record of these locations. If you want to validate a CSV file that contains sensitive information, use the POST API and send a file, not a URL!</p>
+
+  <p>For more on privacy please see the <a href="/privacy">privacy policy</a>.</p>
+
+  <h2>Endpoints</h2>
+  <p><code>POST /validate</code></p>
+  <p><code>GET /validate</code></p>
+
+  <h3>1. POST /validate</h3>
+  <p>This endpoint validates a CSV file provided as a URL or file upload, with an optional schema for validation.</p>
+
+  <h4>Headers</h4>
+  <ul>
+    <li><strong>Content-Type:</strong> <code>multipart/form-data</code> (required)</li>
+    <li><strong>Accept:</strong> <code>application/json</code> (optional, for JSON response)</li>
+  </ul>
+
+  <h4>Parameters</h4>
+  <ul>
+    <li><strong>csvUrl</strong> (string): URL of the CSV file to validate (optional if uploading a file).</li>
+    <li><strong>file</strong> (file): CSV file upload for validation (optional if using a URL).</li>
+    <li><strong>schemaUrl</strong> (string): URL of a JSON schema for the CSV structure (optional).</li>
+    <li><strong>schema</strong> (file): JSON schema file upload for the CSV structure (optional).</li>
+    <li><strong>Dialect Options</strong>: Optional CSV dialect options to customize validation.</li>
+  </ul>
+
+  <h4>Example Usage</h4>
+  <h5>Using a CSV URL</h5>
+  <pre><code>curl -X POST http://csvlint.io/validate \
+  -H "Accept: application/json" \
+  -F "csvUrl=http://example.com/mydata.csv" \
+  -F "schemaUrl=http://example.com/myschema.json"</code></pre>
+
+  <h5>Using File Upload</h5>
+  <pre><code>curl -X POST http://csvlint.io/validate \
+  -H "Accept: application/json" \
+  -F "file=@/path/to/yourfile.csv" \
+  -F "schema=@/path/to/yourschema.json"</code></pre>
+
+  <h5>Using Dialect Options</h5>
+  <pre><code>curl -X POST http://csvlint.io/validate \
+  -H "Accept: application/json" \
+  -F "file=@/path/to/yourfile.csv" \
+  -F "delimiter=;" \
+  -F "header=true"</code></pre>
+
+  <h3>2. GET /validate</h3>
+  <p>This endpoint allows you to validate a CSV file by providing URLs for the CSV and schema directly in the query parameters, along with optional dialect settings. This is useful for integrations where files are hosted remotely.</p>
+
+  <h4>Parameters</h4>
+  <ul>
+    <li><strong>csvUrl</strong> (string): URL of the CSV file to validate (required).</li>
+    <li><strong>schemaUrl</strong> (string): URL of a JSON schema for the CSV structure (optional).</li>
+    <li><strong>Dialect Options</strong>: Optional CSV dialect options as query parameters (e.g., <code>delimiter</code>, <code>doubleQuote</code>, <code>lineTerminator</code>, etc.)</li>
+    <li><strong>format</strong> (string): Set to <code>svg</code> or <code>png</code> to receive a badge representing the validation result.</li>
+  </ul>
+
+  <h4>Example Usage</h4>
+  <h5>Validate a CSV with a URL</h5>
+  <pre><code>curl -X GET "http://csvlint.io/validate?csvUrl=http://example.com/mydata.csv&schemaUrl=http://example.com/myschema.json"</code></pre>
+
+  <h5>Retrieve Validation Badge</h5>
+  <p>Use <code>?format=svg</code> or <code>?format=png</code> to directly retrieve a badge for the validation result. This will return an SVG or PNG badge based on the CSV’s validation status.</p>
+  <pre><code>curl -X GET "http://csvlint.io/validate?csvUrl=http://example.com/mydata.csv&format=svg"</code></pre>
+
+  <h2>Response Format (JSON)</h2>
+  <p>If the <code>Accept</code> header is set to <code>application/json</code>, the API will respond with JSON in the following format:</p>
+  <pre><code>{
+  "version": "0.2",
+  "licence": "http://opendatacommons.org/licenses/odbl/",
+  "validation": {
+    "source": "http://example.com/mydata.csv",
+    "schema": "http://example.com/myschema.json",
+    "state": "invalid",
+    "errors": [
+      {
+        "type": "undeclared_header",
+        "category": "structure",
+        "row": null,
+        "col": null
+      }
+    ],
+    "warnings": [
+      {
+        "type": "header_name",
+        "category": "schema",
+        "row": null,
+        "col": 1
+      }
+    ],
+    "info": [
+      {
+        "type": "assumed_header",
+        "category": "structure",
+        "row": null,
+        "col": null
+      }
+    ]
+  }
+}</code></pre>
+
+  <h2>Embed Badge Code</h2>
+  <p>You can also directly embed a badge on your website to show its validation status.</p>
+
+  <h4>Example Embed Code</h4>
+  <pre><code>&lt;a href="http://csvlint.io/validate?csvUrl=http://example.com/mydata.csv" target="_blank"&gt;
+  &lt;img src="http://csvlint.io/validate?csvUrl=http://example.com/mydata.csv&amp;format=svg" alt="CSV Validation Badge"&gt;
+&lt;/a&gt;</code></pre>
+
+</section>
+<%- include('./partials/footer') %>

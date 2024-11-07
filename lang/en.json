@@ -1,0 +1,41 @@
+{
+    "errors": {
+      "missing_value": "This field is required but is missing.",
+      "min_length": "This field does not meet the minimum length requirement.",
+      "max_length": "This field exceeds the maximum length allowed.",
+      "pattern": "The value does not match the required pattern.",
+      "unique": "This field must be unique, but a duplicate value was found.",
+      "invalid_type": "The value is not of the expected type.",
+      "below_minimum": "The value is below the minimum allowed.",
+      "above_maximum": "The value is above the maximum allowed.",
+      "invalid_enum_value": "The value is not one of the allowed options.",
+      "invalid_regex": "The provided regular expression pattern is invalid.",
+      "wrong_content_type": "The content type is not 'text/csv'.",
+      "ragged_rows": "Row has a different number of columns than the first row.",
+      "blank_rows": "The row is completely empty.",
+      "invalid_encoding": "Encoding error when parsing row due to invalid characters.",
+      "not_found": "HTTP 404 error when retrieving the data.",
+      "stray_quote": "There is a missing or stray quote in the row.",
+      "unclosed_quote": "There is an unclosed quoted field in the row.",
+      "whitespace": "A quoted column has leading or trailing whitespace.",
+      "line_breaks": "Line breaks were inconsistent or incorrectly specified."
+    },
+    "warnings": {
+      "malformed_header": "The header row does not match the expected structure.",
+      "missing_column": "A column is missing from this row.",
+      "extra_column": "There is an extra column in this row.",
+      "no_encoding": "The Content-Type header does not have a charset parameter.",
+      "encoding": "The character set is not UTF-8.",
+      "no_content_type": "The file is being served without a Content-Type header.",
+      "excel": "The file extension is .xls and lacks a Content-Type header.",
+      "check_options": "The CSV file appears to contain only a single column.",
+      "inconsistent_values": "Inconsistent values in the same column.",
+      "empty_column_name": "A column in the CSV header has an empty name.",
+      "duplicate_column_name": "A column in the CSV header has a duplicate name.",
+      "title_row": "There appears to be a title field in the first row of the CSV."
+    },
+    "info": {
+      "assumed_header": "A header row is assumed to be present based on the file format.",
+      "nonrfc_line_breaks": "The file uses non-standard line breaks, which may cause compatibility issues."
+    }
+  }

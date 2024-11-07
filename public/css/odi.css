@@ -1,0 +1,363 @@
+:root {
+    /* Screens */
+    --screen-xxs: 350px;
+    --screen-xs: 580px;
+    --screen-sm: 640px;
+    --screen-md: 768px;
+    --screen-lg: 1024px;
+    --screen-xl: 1280px;
+
+    /* Colors */
+    --color-white: #FFFFFF;
+    --color-transparent: transparent;
+    --color-black: #000000;
+    --color-dark-grey: #333333;
+    --color-light-grey: #E2E6E9;
+    --color-dark-blue: #072589;
+    --color-light-blue: #6DF8FF;
+    --color-pink: #F467C0;
+    --color-orange: #F37533;
+    --color-light-green: #6BF58B;
+    --color-dark-green: #1DD3A7;
+    --color-progress-pie-progress: #a5e6b3;
+
+    /* Font Family */
+    --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+    /* Font Sizes */
+    --font-size-14: 0.875rem;
+    --line-height-14: 1.5rem;
+    --font-size-16: 1rem;
+    --line-height-16: 1.625rem;
+    --font-size-18: 1.125rem;
+    --line-height-18: 1.5rem;
+    --font-size-20: 1.25rem;
+    --line-height-20: 1.625rem;
+    --font-size-22: 1.375rem;
+    --line-height-22: 2rem;
+    --font-size-24: 1.5rem;
+    --line-height-24: 2.125rem;
+    --font-size-25: 1.563rem;
+    --line-height-25: 1.875rem;
+    --font-size-32: 2rem;
+    --line-height-32: 2.625rem;
+    --font-size-35: 2.188rem;
+    --line-height-35: 2.813rem;
+    --font-size-45: 2.813rem;
+    --line-height-45: 3.125rem;
+    --font-size-52: 3.25rem;
+    --line-height-52: 3.875rem;
+    --font-size-56: 3.5rem;
+    --line-height-56: 4.125rem;
+    --font-size-85: 5.313rem;
+    --line-height-85: 5.938rem;
+
+    --button-base: var(--color-dark-blue);
+    --button-hover: var(--color-light-grey);
+    --button-hover-color: var(--color-dark-blue);
+    --background: var(--color-white);
+    --background-body: var(--color-white);
+    --links: var(--color-dark-blue);
+}
+
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0px;
+    min-width: 100%;
+    padding-left: 0px;
+}
+h2 {
+    font-size: 1.5em;
+}
+h3 {
+    font-size: 1.2em;
+}
+h1, h2, h3, h4 {
+    color: var(--color-dark-blue);
+}
+section {
+    padding: 2em;
+}
+.odi-logo {
+    height: 40px;
+    margin-top: 20px;
+    margin-left: 50px;
+}
+/*
+ * General colours
+ */
+ input, select, textarea {
+    border-radius: 0 !important;
+    color: var(--color-dark-blue);
+  }
+ .white {
+    background-color: rgb(255 255 255);
+    color: var(--color-dark-blue)
+  }
+  .white strong {
+    color: var(--color-dark-blue);
+  }
+  .white h1, .white h2, .white h3 {
+    color: var(--color-dark-blue)
+  }
+  .dark-blue {
+    background-color: var(--color-dark-blue)
+  }
+  .dark-blue a {
+    color: white;
+    text-decoration: underline;
+  }
+  .white {
+    background-color: var(--color-white);
+    color: black;
+  }
+  .light-grey {
+    background-color: var(--color-light-grey);
+    color: black;
+  }
+  .light-grey h1, .light-grey h2, .light-grey h3, .light-grey h4, .light-grey h5 {
+    color: var(--color-dark-blue) !important;
+  }
+  .light-blue {
+    background-color: rgb(219 234 254);
+    color: black;
+  }
+  .light-blue h1, .light-blue h2, .light-blue h3, .light-blue h4 {
+    color: var(--color-dark-blue);
+  }
+  .yellow {
+    background-color: rgb(255 237 213);
+    color: black;
+  }
+  .yellow h1, .yellow h2, .yellow h3 {
+    color: var(--color-dark-blue)
+  }
+  .light-yellow {
+    background-color: rgba(255,237,213,0.4);
+  }
+/*
+ * Header
+ */
+.page-title h1 {
+    font-family: Inter,system-ui,Avenir,Helvetica,Arial,sans-serif;
+    text-align: left;
+    font-weight: 700;
+    font-size: 3rem;
+}
+.version {
+    position: absolute;
+    top: -10px;
+    right: 10px;
+}
+.version a {
+    color: white;
+    font-size: 0.7rem;
+}
+/*
+ * Lists
+ */
+ul {
+    padding-inline: 18px;
+}
+li {
+    margin-bottom: 0.5rem;
+}
+/*
+ * Navigation and project progress bar
+ */
+ .header {
+    background:  var(--color-dark-blue);
+    background-color:  var(--color-dark-blue);
+    max-height: 98px;
+  }
+  .header .header-top {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 0;
+  }
+
+  .container {
+    padding: 10px;
+  }
+  .content-block {
+    padding: 1rem 30px 2rem 30px;
+  }
+
+  @media (min-width: 768px) {
+    .header .header-top {
+      padding: 30px 0;
+    }
+    .container {
+      padding: 0 100px;
+    }
+    .content-block {
+      padding: 1rem 100px 2rem 100px;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    .header .header-top {
+      padding: 30px 0;
+    }
+    .container {
+      padding: 0 100px;
+    }
+    .content-block {
+      padding: 1rem 100px 2rem 100px;
+    }
+  }
+
+  .header .main-nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+  }
+
+  .header .main-nav ul li {
+    padding: 8px 0px 8px 20px;
+  }
+  .header .main-nav ul .selected {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .header .main-nav ul a,
+  .header .main-nav ul button {
+    cursor: pointer;
+    color: #fff;
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0px;
+    border-radius: 25px;
+    border: none;
+    text-decoration: none;
+    background: none;
+  }
+
+  .header .main-nav ul a:hover,
+  .header .main-nav ul button:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px; /* Adjust this value as needed */
+  }
+
+  @media (min-width: 768px) {
+    .header .main-nav ul a,
+    .header .main-nav ul button {
+      font-size: 1rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .header .main-nav ul a,
+    .header .main-nav ul button {
+      font-size: 1rem;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    .header .main-nav ul a,
+    .header .main-nav ul button {
+      font-size: 1rem;
+    }
+  }
+
+  .header .main-nav ul img {
+    margin-left: 8px;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin-top: -4px;
+  }
+
+  .header .main-nav ul .logout {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+
+  .header .logo {
+    width: 120px;
+    height: 55px;
+    background-image: url('/images/odilabs-8-dark.svg');
+    background-repeat: no-repeat;
+    background-size: contain;
+    position: relative;
+    top: -7px;
+    left: -6px;
+  }
+/* Overlay styles */
+.overlay {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+    overflow: auto;
+}
+.overlay .overlay-content {
+    display: flex;
+    background-color: #fefefe; /* White background */
+    margin: 15% auto; /* Center the overlay vertically */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%; /* Adjust the width of the overlay */
+    color: black;
+    position: relative;
+}
+.overlay .overlay-content h2 {
+  color: var(--color-dark-blue)
+}
+.overlay .share-section {
+  flex: 1;
+  margin: 0 10px;
+}
+.overlay .share-section h2 {
+  margin-bottom: 10px;
+}
+.overlay .share-section form {
+  margin-bottom: 20px;
+}
+.overlay .close-btn {
+  color: #aaaaaa;
+  float: right;
+  font-size: 3rem;
+  font-weight: normal;
+  position: absolute;
+  top: 0;
+  right: 20px;
+}
+
+.overlay .close-btn:hover,
+.overlay .close-btn:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+/*
+ * Buttons
+*/
+.btn, button, .submitButton {
+  border-radius: 0px;
+  font-weight: 500;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  padding-top: .5rem;
+  padding-bottom: .5rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  border: none !important;
+  color: white !important;
+  background-color: var(--button-base);
+  cursor: pointer;
+}
+.btn:hover, button:hover, .submitButton:hover {
+  background-color: var(--color-light-grey);
+  color: var(--color-dark-blue) !important;
+}

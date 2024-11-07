@@ -1,0 +1,77 @@
+<%- include('./partials/header') %>
+
+<section class="privacy-policy">
+  <h1>Privacy Policy</h1>
+
+  <p>This service is maintained by an open-source community and hosted by the Open Data Institute (ODI). The purpose of this document is to explain how we handle your data and your rights regarding this data.</p>
+
+  <h2>What Data Do We Collect and Why?</h2>
+
+  <p>In order for the service to function we must temporarily store the data you submit:</p>
+
+  <ul>
+    <li><strong>If you submit a URL for validation:</strong> We use a one-way hash to identify duplicate validations and ensure privacy. The actual URL is not stored, only a unique hash based on the URL and schema combination (if provided). This allows us to recognise repeat requests without retaining the original URLs.</li>
+    <li><strong>If you upload a file for validation:</strong> The file data is stored temporarily to perform the validation process and is deleted immediately after the validation completes. No CSV content or schema content is retained after validation.</li>
+  </ul>
+
+  <p><strong>Note:</strong> Because the validation results are stored without URLs or CSV content, it is not possible to rerun a validation using the validation ID, you much re-run the validation either via the web interface or API. This preserves your privacy while allowing us to keep records of validation counts and summaries.</p>
+
+  <h2>Other Data We Collect</h2>
+
+  <p>We also collect anonymized data about your usage of this website to understand site performance and user preferences. This includes information on:</p>
+
+  <ul>
+    <li>Which pages you access, helping us understand popular content</li>
+    <li>Your device and software, so we can improve design compatibility</li>
+    <li>General location data, to assess our global reach</li>
+  </ul>
+
+  <p>We do not link this data to any personally identifiable information (PII), such as your name or email address, and we store it only in an aggregated, anonymized format.</p>
+
+  <h2>How We Use and Share Your Data</h2>
+
+  <p>We use data collected on this site to improve our service and understand our audience. We do not engage in any automated decision-making or profiling.</p>
+
+  <p>We share some anonymized data with trusted third-party providers for analytics:</p>
+  <ul>
+    <li><strong>Google Analytics:</strong> To analyse visitor interactions with our website</li>
+  </ul>
+
+  <p>These third parties are either located in the EU or have agreed to protect data to the standards set by the EU. We may also share data with legal authorities if required by law.</p>
+
+  <h2>Cookies</h2>
+  <p>Your browser may store some data as cookies to provide essential functionality and performance analysis. For more information, refer to our <a href="/cookie-policy">Cookie Policy</a>.</p>
+
+  <h2>Your Rights and Control Over Your Data</h2>
+
+  <p>As a UK-based organization, we comply with UK data protection regulations, which grant you specific rights over your data. You have the right to:</p>
+  <ul>
+    <li>Request a copy of the data we hold about you</li>
+    <li>Request corrections or updates to this data</li>
+    <li>Ask us to delete your data, where applicable</li>
+    <li>Request that we stop using your data</li>
+  </ul>
+
+  <p>To exercise your rights, please contact us at <a href="mailto:datacontroller@theodi.org">datacontroller@theodi.org</a>.</p>
+
+  <p>Please note, that as we anonymise the data, in the majority of cases it will not be possible to link the data we have to you. For example, a validation report contains no reference to, or any content from what was validated.</p>
+
+  <h2>Policy Changes</h2>
+
+  <p>This privacy policy was created on May 15, 2018, and last updated on November 7th 2024. We may make changes to this policy from time to time. When we do, we will update the the last updated data here.</p>
+
+  <h2>Contact Information</h2>
+
+  <p>The data controller for this website is the Open Data Institute, located at:</p>
+  <address>
+    Open Data Institute<br>
+    4th Floor, Kings Place<br>
+    90 York Way<br>
+    London N1 9AG
+  </address>
+
+  <p>If you have questions or concerns about this privacy policy, please reach out to us at <a href="mailto:datacontroller@theodi.org">datacontroller@theodi.org</a>.</p>
+
+</section>
+
+<%- include('./partials/footer') %>

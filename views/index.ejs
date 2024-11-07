@@ -1,0 +1,123 @@
+<%- include('./partials/header') %>
+<section class="white main">
+
+  <div class="content-wrapper">
+
+    <!-- Text Section -->
+    <subsection class="text">
+      <h1>CSVLint.io</h1>
+      <p class="subtitle">CSV looks easy, but it can be hard to make a CSV file that other people can read easily.</p>
+      <p>CSVLint helps you to check that your CSV file is readable. And you can use it to check whether it contains the columns and types of values that it should.</p>
+      <p>Just enter the location of the file you want to check, or upload it. If you have a schema which describes the contents of the CSV file, you can also give its URL or upload it.</p>
+      <h2>Privacy and data retention</h2>
+      <p>All files either linked or uploaded to this service are deleted immediatly after the validation.</p>
+      <p>Validation reports are retained but the filenames/locations and any referenced content are removed from the report before it is stored.</p>
+    </subsection>
+
+    <!-- Validation Box -->
+    <subsection class="validation-box">
+      <h2>Validate your CSV</h2>
+      <form action="/validate" method="post" enctype="multipart/form-data">
+        <!-- CSV URL or File -->
+        <div>
+          <label class="main-label" for="csvUrl">CSV File</label>
+          <input class="url" type="url" name="csvUrl" placeholder="Enter CSV URL" />
+          <div class="or-divider">or</div>
+          <label for="fileUploadCSV" class="btn">Upload CSV File</label>
+          <input type="file" name="file" accept=".csv" id="fileUploadCSV" class="file-input" onchange="updateFileName('fileUploadCSV', 'csvFileName')" />
+          <span id="csvFileName" class="file-name"></span>
+        </div>
+        <br/>
+
+        <!-- Schema URL or File -->
+        <div>
+          <label class="main-label" for="schemaUrl">Schema URL (optional)</label>
+          <input class="url" type="url" name="schemaUrl" placeholder="Enter Schema URL" />
+          <div class="or-divider">or</div>
+          <label for="fileUploadSchema" class="btn">Upload Schema File</label>
+          <input type="file" name="schema" accept=".json" id="fileUploadSchema" class="file-input" onchange="updateFileName('fileUploadSchema', 'schemaFileName')" />
+          <span id="schemaFileName" class="file-name"></span>
+        </div>
+
+        <button type="button" class="toggle-dialect-btn" onclick="toggleDialectOptions()">Show Dialect Options</button>
+        <div id="dialectOptions" class="dialect-options collapsed">
+          <div class="dialect-option">
+            <label for="delimiter">Delimiter</label>
+            <input type="text" name="delimiter" maxlength="2" placeholder="Set delimiter" />
+          </div>
+
+          <div class="dialect-option">
+            <label for="doubleQuote">Double Quote</label>
+            <select name="doubleQuote">
+              <option value="" selected>Not Set</option>
+              <option value="true">True</option>
+              <option value="false">False</option>
+            </select>
+          </div>
+
+          <div class="dialect-option">
+            <label for="lineTerminator">Line Terminator</label>
+            <input type="text" name="lineTerminator" placeholder="Set line terminator" />
+          </div>
+
+          <div class="dialect-option">
+            <label for="nullSequence">Null Sequence</label>
+            <input type="text" name="nullSequence" placeholder="Set null sequence" />
+          </div>
+
+          <div class="dialect-option">
+            <label for="quoteChar">Quote Character</label>
+            <input type="text" name="quoteChar" maxlength="1" placeholder="Set quote character" />
+          </div>
+
+          <div class="dialect-option">
+            <label for="escapeChar">Escape Character</label>
+            <input type="text" name="escapeChar" maxlength="1" placeholder="Set escape character" />
+          </div>
+
+          <div class="dialect-option">
+            <label for="header">Header Row Present</label>
+            <select name="header">
+              <option value="" selected>Not Set</option>
+              <option value="true">True</option>
+              <option value="false">False</option>
+            </select>
+          </div>
+
+          <div class="dialect-option">
+            <label for="caseSensitiveHeader">Case Sensitive Header</label>
+            <select name="caseSensitiveHeader">
+              <option value="" selected>Not Set</option>
+              <option value="true">True</option>
+              <option value="false">False</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit">Validate CSV</button>
+      </form>
+    </subsection>
+
+  </div>
+</section>
+<script>
+  function toggleDialectOptions() {
+    const dialectOptions = document.getElementById("dialectOptions");
+    const toggleButton = document.querySelector(".toggle-dialect-btn");
+
+    dialectOptions.classList.toggle("collapsed");
+
+    if (dialectOptions.classList.contains("collapsed")) {
+      toggleButton.textContent = "Show Dialect Options";
+    } else {
+      toggleButton.textContent = "Hide Dialect Options";
+    }
+  }
+  function updateFileName(inputId, fileNameId) {
+    const input = document.getElementById(inputId);
+    const fileNameDisplay = document.getElementById(fileNameId);
+
+    // Display the selected file name, or reset if no file is selected
+    fileNameDisplay.textContent = input.files.length > 0 ? input.files[0].name : '';
+  }
+</script>
+<%- include('./partials/footer') %>

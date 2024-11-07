@@ -1,0 +1,25 @@
+<% function formatType(type) {
+    return type.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+  }
+%>
+<div class="message-box <%= errorType %>">
+    <div class="message-header">
+      <span class="message-category"><%= category %> <%= errorType %></span> -
+      <span class="message-type"><%= formatType(type) %></span>
+    </div>
+    <div class="message-content">
+      <p><%= message %></p>
+      <p>
+        <% if (row && column) { %>
+          Location: Row <%= row %>, Column <%= column %>
+        <% } else if (row) { %>
+          Location: Row <%= row %>
+        <% } else if (column) { %>
+          Location: Column <%= column %>
+        <% } %>
+      </p>
+      <% if (content) { %>
+        <pre><code><%= content %></code></pre>
+      <% } %>
+    </div>
+  </div>

@@ -1,0 +1,126 @@
+<%- include('./partials/header') %>
+<section class="white main" data-id="<%= data.id %>">
+  <h1>CSV Validation Results</h1>
+
+  <!-- Validity Status -->
+  <div class="csv-status <%= data.valid ? 'valid' : 'invalid' %>">
+    <p>The CSV file is <strong><%= data.valid ? 'Valid' : 'Invalid' %></strong></p>
+  </div>
+
+  <!-- Summary Table -->
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Count</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Errors</td>
+        <td><%= data.errors.length %></td>
+      </tr>
+      <tr>
+        <td>Warnings</td>
+        <td><%= data.warnings.length %></td>
+      </tr>
+      <tr>
+        <td>Info Messages</td>
+        <td><%= data.info.length %></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Errors</h2>
+  <% if (data.errors.length > 0) { %>
+    <% data.errors.forEach(error => { %>
+      <%- include('_message', {
+            errorType: "Error",
+            type: error.type,
+            category: error.category,
+            message: error.message,
+            row: error.row,
+            column: error.column,
+            content: error.content
+      }) %>
+    <% }) %>
+  <% } else { %>
+    <p>No errors found.</p>
+  <% } %>
+
+  <h2>Warnings</h2>
+  <% if (data.warnings.length > 0) { %>
+    <% data.warnings.forEach(warning => { %>
+      <%- include('_message', {
+            errorType: "Warning",
+            type: warning.type,
+            category: warning.category,
+            message: warning.message,
+            row: warning.row,
+            column: warning.column,
+            content: warning.content
+      }) %>
+    <% }) %>
+  <% } else { %>
+    <p>No warnings found.</p>
+  <% } %>
+
+  <h2>Info Messages</h2>
+  <% if (data.info.length > 0) { %>
+    <% data.info.forEach(info => { %>
+      <%- include('_message', {
+            errorType: "Info",
+            type: info.type,
+            category: info.category,
+            message: info.message,
+            row: info.row,
+            column: info.column,
+            content: info.content
+      }) %>
+    <% }) %>
+  <% } else { %>
+    <p>No informational messages found.</p>
+  <% } %>
+
+  <!-- Embed Code (only shown if embedding is allowed) -->
+  <% if (isEmbedAllowed) { %>
+    <h2>Badge</h2>
+      <div class="badge">
+        <% if (data.errors.length > 0) { %>
+          <picture>
+            <source srcset="/images/invalid.svg" type="image/svg+xml">
+            <img src="/images/invalid.png" alt="Invalid Badge">
+          </picture>
+        <% } else if (data.warnings.length > 0) { %>
+          <picture>
+            <source srcset="/images/warnings.svg" type="image/svg+xml">
+            <img src="/images/warnings.png" alt="Warnings Badge">
+          </picture>
+        <% } else { %>
+          <picture>
+            <source srcset="/images/valid.svg" type="image/svg+xml">
+            <img src="/images/valid.png" alt="Valid Badge">
+          </picture>
+        <% } %>
+      </div>
+      <p>Copy the code below to embed this validation badge on your site:</p>
+<pre>&lt;a href="<%= validationUrl %>" target="_blank"&gt;
+&lt;img src="<%= badgeUrl %>" alt="CSV Validation Badge"&gt;
+&lt;/a&gt;
+</pre>
+  <% } %>
+
+  <button type="button" onclick="window.location.href='/'" style="width: 100%; margin-top: 1em;">Validate another CSV</button>
+</section>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const section = document.querySelector("section.white.main");
+    const id = section.getAttribute("data-id");
+    if (id) {
+      const newUrl = `/validation/${id}`;
+      history.pushState({ path: newUrl }, '', newUrl);
+    }
+  });
+</script>
+
+<%- include('./partials/footer') %>

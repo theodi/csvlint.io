@@ -1,0 +1,38 @@
+{
+    "fields": [
+      {
+        "name": "Name",
+        "title": "Student Name",
+        "constraints": {
+          "type": "http://www.w3.org/2001/XMLSchema#string",
+          "required": true
+        }
+      },
+      {
+        "name": "Age",
+        "title": "Student Age",
+        "constraints": {
+          "type": "http://www.w3.org/2001/XMLSchema#integer",
+          "required": true,
+          "minimum": 18
+        }
+      },
+      {
+        "name": "Grade",
+        "title": "Grade",
+        "constraints": {
+          "type": "http://www.w3.org/2001/XMLSchema#string",
+          "required": true,
+          "enum": ["A", "B", "C"]
+        }
+      },
+      {
+        "name": "Enrolled",
+        "title": "Enrolled Status",
+        "constraints": {
+          "type": "http://www.w3.org/2001/XMLSchema#boolean",
+          "required": true
+        }
+      }
+    ]
+  }

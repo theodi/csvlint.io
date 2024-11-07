@@ -1,0 +1,48 @@
+<!-- views/partials/header.ejs -->
+<!DOCTYPE html>
+<html prefix="dct: http://purl.org/dc/terms/
+              rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#
+              dcat: http://www.w3.org/ns/dcat#
+              odrs: http://schema.theodi.org/odrs#">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>CSV Lint</title>
+
+<link href="/css/water.css" rel="stylesheet">
+<link href="/css/odi.css" rel="stylesheet">
+<link href="/css/csvlint.css" rel="stylesheet">
+
+<link rel="shortcut icon" href="/images/odifavicon32.ico">
+
+</head>
+<body>
+	<div id="contentOverlay" class="overlay">
+		<div id="overlay-content" class="overlay-content" style="width: 90%; margin: auto; margin-top: 20px; max-height: 90vh;">
+			<span class="close-btn" onclick="closeOverlay()" style="right: 40px;
+			top: 20px;
+			font-size: 3rem;
+			font-weight: normal;">&times;</span>
+			<div id="overlay-content-inner" style="overflow-y: scroll; min-width: 100%;"></div>
+		</div>
+	</div>
+	<header class="header">
+		<p class="version"><a href="<%= software.versionLink %>" target="_blank">v<%= software.version %></a></p>
+		<div class="container">
+			<div class="header-top">
+			<a href="/" class="logo"></a>
+			<nav class="main-nav" aria-label="Main Menu">
+                <ul>
+					<li><a href="/" class="toggle-link">Validate</a></li>
+					<li><a href="/examples" class="toggle-link">Examples</a></li>
+					<li><a href="/api" class="toggle-link">API</a></li>
+                    <li><a href="/about" class="toggle-link">About</a></li>
+					<li><a href="/privacy" class="toggle-link">Privacy</a></li>
+                </ul>
+			</nav>
+			</div>
+		</div>
+	</header>
