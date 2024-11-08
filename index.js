@@ -325,6 +325,8 @@ app.post('/validate', upload.fields([{ name: 'file' }, { name: 'schema' }]), asy
       // Set the hash in the validation data if it was generated
       if (hash) {
         validationDataForStorage.hash = hash;
+      } else {
+        validationDataForStorage.hash = `placeholder_${new mongoose.Types.ObjectId().toHexString()}`;
       }
 
       // Use findOneAndUpdate if the hash is generated to prevent duplicate entries
