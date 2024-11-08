@@ -36,7 +36,11 @@ db.once('open', function() {
 });
 
 const app = express();
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({
+  dest: 'uploads/',
+  limits: { fileSize: 10 * 1024 * 1024 } // Set file size limit to 5MB (adjust as needed)
+});
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 5MB limit
 
 function generateTempFileName(prefix, extension) {
   const uniqueId = crypto.randomBytes(8).toString('hex');
@@ -140,10 +144,22 @@ app.get('/validate', async (req, res) => {
     const form = new FormData();
 
     if (csvUrl) {
+      const lengthResponse = await axios.head(csvUrl);
+      const contentLength = parseInt(lengthResponse.headers['content-length'], 10);
+
+      if (contentLength > MAX_FILE_SIZE) {
+        return res.status(400).json({ error: 'CSV file size exceeds the allowed limit' });
+      }
       form.append('csvUrl', csvUrl);
     }
 
     if (schemaUrl) {
+      const lengthResponse = await axios.head(schemaUrl);
+      const contentLength = parseInt(lengthResponse.headers['content-length'], 10);
+
+      if (contentLength > MAX_FILE_SIZE) {
+        return res.status(400).json({ error: 'Schema file size exceeds the allowed limit' });
+      }
       form.append('schemaUrl', schemaUrl);
     }
 
@@ -240,7 +256,16 @@ app.get('/validate', async (req, res) => {
 
 
 // Route to handle CSV file upload and validation
-app.post('/validate', upload.fields([{ name: 'file' }, { name: 'schema' }]), async (req, res) => {
+app.post('/validate', (req, res, next) => {
+  upload.fields([{ name: 'file' }, { name: 'schema' }])(req, res, (err) => {
+    if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: 'File size exceeds the allowed limit of 10mb' });
+    } else if (err) {
+      return res.status(500).json({ error: 'Error uploading files' });
+    }
+    next();
+  });
+}, async (req, res) => {
     let csvPath, schemaPath;
     try {
       const form = new FormData();
@@ -251,6 +276,12 @@ app.post('/validate', upload.fields([{ name: 'file' }, { name: 'schema' }]), asy
       const isSchemaUrl = Boolean(req.body.schemaUrl);
 
       if (isCsvUrl) {
+        const lengthResponse = await axios.head(req.body.csvUrl);
+        const contentLength = parseInt(lengthResponse.headers['content-length'], 10);
+
+        if (contentLength > MAX_FILE_SIZE) {
+          return res.status(400).json({ error: 'CSV file size exceeds the allowed limit' });
+        }
         form.append('csvUrl', req.body.csvUrl);
       } else if (req.files.file) {
         form.append('file', fs.createReadStream(req.files.file[0].path));
@@ -258,6 +289,12 @@ app.post('/validate', upload.fields([{ name: 'file' }, { name: 'schema' }]), asy
       }
 
       if (isSchemaUrl) {
+        const lengthResponse = await axios.head(req.body.schemaUrl);
+        const contentLength = parseInt(lengthResponse.headers['content-length'], 10);
+
+        if (contentLength > MAX_FILE_SIZE) {
+          return res.status(400).json({ error: 'Schema file size exceeds the allowed limit' });
+        }
         form.append('schemaUrl', req.body.schemaUrl);
       } else if (req.files.schema) {
         form.append('schema', fs.createReadStream(req.files.schema[0].path));
