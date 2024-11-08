@@ -1,0 +1,29 @@
+How to Use the CSVLint Webservice API
+
+CSVLint has a Webservice API that allows you to POST a file and return a validation.
+
+Currently you POST a file like so:
+
+curl -L --data "urls[]=http://theodi.github.io/hot-drinks/hot-drinks.csv" http://csvlint.io/package.json
+
+(urls[] can also be a comma seperated list of urls)
+
+Or with a schema:
+
+curl -L --data "urls[]=http://theodi.github.io/hot-drinks/hot-drinks.csv&schema=1&schema_url=http://example.com/some_schema.json" http://csvlint.io/package.json
+
+And you get back some json with a URL to a package:
+
+{
+  "package": {
+    "url":"http://csvlint.io/package/53a150336373764c17170700"
+  }
+}
+
+You can then get the validation by making a request to the JSON version of the package like so:
+
+curl http://csvlint.io/package/53a150336373764c17170700.json
+
+Note Currently the package is created in the background, so may not be available immediately. This will change in the future.
+
+This then returns the JSON version of the package:

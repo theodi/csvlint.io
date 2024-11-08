@@ -26,7 +26,11 @@ input.file {
     flex: 1;
     min-width: 280px;
 }
-
+pre {
+    white-space: pre-wrap; /* Allows the text to wrap within the pre element */
+    word-wrap: break-word; /* Breaks long words to fit within the container */
+    overflow-x: auto; /* Adds horizontal scroll if needed */
+  }
 /* Validation box styling */
 .validation-box {
     flex: 1;
@@ -37,6 +41,20 @@ input.file {
     border-radius: 0;
     background-color: var(--color-light-grey);
 
+}
+@media (max-width: 768px) {
+  .validation-box {
+    width: 75vw;
+  }
+  .homeNav {
+    display: none;
+  }
+  section {
+    padding: 1em;
+  }
+  h1 {
+    margin-top: 12px;
+  }
 }
 .validation-box h2 {
     margin-top: 0em;
