@@ -139,22 +139,12 @@ app.get('/validate', async (req, res) => {
 
     const form = new FormData();
 
-    // Handle CSV URL
     if (csvUrl) {
-      const response = await axios.get(csvUrl, { responseType: 'stream' });
-      csvPath = generateTempFileName('csv', 'csv');
-      response.data.pipe(fs.createWriteStream(csvPath));
-      await new Promise((resolve) => response.data.on('end', resolve));
-      form.append('file', fs.createReadStream(csvPath));
+      form.append('csvUrl', csvUrl);
     }
 
-    // Handle Schema URL
     if (schemaUrl) {
-      const response = await axios.get(schemaUrl, { responseType: 'stream' });
-      schemaPath = generateTempFileName('schema', 'json');
-      response.data.pipe(fs.createWriteStream(schemaPath));
-      await new Promise((resolve) => response.data.on('end', resolve));
-      form.append('schema', fs.createReadStream(schemaPath));
+      form.append('schemaUrl', schemaUrl);
     }
 
     // Collect dialect options from the query params
@@ -260,29 +250,20 @@ app.post('/validate', upload.fields([{ name: 'file' }, { name: 'schema' }]), asy
       const isCsvUrl = Boolean(req.body.csvUrl);
       const isSchemaUrl = Boolean(req.body.schemaUrl);
 
-      // Handle CSV file or URL
       if (isCsvUrl) {
-        const response = await axios.get(req.body.csvUrl, { responseType: 'stream' });
-        csvPath = generateTempFileName('csv', 'csv');
-        response.data.pipe(fs.createWriteStream(csvPath));
-        await new Promise((resolve) => response.data.on('end', resolve));
+        form.append('csvUrl', req.body.csvUrl);
       } else if (req.files.file) {
+        form.append('file', fs.createReadStream(req.files.file[0].path));
         csvPath = req.files.file[0].path;
       }
 
-      form.append('file', fs.createReadStream(csvPath));
-
-      // Handle Schema file or URL
       if (isSchemaUrl) {
-        const response = await axios.get(req.body.schemaUrl, { responseType: 'stream' });
-        schemaPath = generateTempFileName('schema', 'json');
-        response.data.pipe(fs.createWriteStream(schemaPath));
-        await new Promise((resolve) => response.data.on('end', resolve));
-        form.append('schema', fs.createReadStream(schemaPath));
+        form.append('schemaUrl', req.body.schemaUrl);
       } else if (req.files.schema) {
+        form.append('schema', fs.createReadStream(req.files.schema[0].path));
         schemaPath = req.files.schema[0].path;
-        form.append('schema', fs.createReadStream(schemaPath));
       }
+
       let isEmbedAllowed = false;
 
       // Only generate a hash if both inputs are URLs or schema is not provided
