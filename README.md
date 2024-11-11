@@ -19,8 +19,7 @@ Ensure that you have the following installed on your system:
 
 - **Node.js** (version 14+ recommended)
 - **MongoDB** (for storing validation reports)
-- **Ruby** (with `csvlint` gem for performing CSV validations)
-
+- **[csvlint-api](https://github.com/theodi/csvlint-api)** (backend service to talk with the `csvlint` validation ruby gem)
 
 ### Installation
 
@@ -35,10 +34,8 @@ Ensure that you have the following installed on your system:
    npm install
    ```
 
-3. **Install Ruby and CSVLint gem**:
-   ```bash
-   gem install csvlint
-   ```
+3. **Install CSVLint API**:
+   Refer to documentation [here](https://github.com/theodi/csvlint-api)
 
 4. **Set up environment variables**:
    Copy `.env.example` to `.env` and set up the environment variables. Key variables include:
@@ -47,17 +44,10 @@ Ensure that you have the following installed on your system:
    - `CSVLINT_API`: URL for the CSVLint Ruby server (e.g., `http://localhost:4567/validate`).
    - `HOST`: Base URL for accessing the validation service (e.g., `https://csvlint.io`).
 
-5. **Start the MongoDB server**:
-   ```bash
-   mongod
-   ```
-
-6. **Start the Node.js server**:
+5. **Start the Node.js server**:
    ```bash
    npm start
    ```
-
-7. **Start the Ruby CSVLint server**:
 
 ### Usage
 
