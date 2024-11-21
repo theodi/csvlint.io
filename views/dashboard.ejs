@@ -1,0 +1,258 @@
+<script src="/lib/d3.js"></script>
+<script src="/lib/crossfilter.js"></script>
+<script src="/lib/dc.js"></script>
+<link rel="stylesheet" href="/lib/dc.css" />
+<%- include('./partials/header') %>
+<style>
+.dashboard {
+  width: 100%;
+  text-align: center;
+}
+.chart-flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Space between charts */
+    justify-content: center; /* Center the charts in the container */
+}
+
+.chart {
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.chart &.bar {
+    flex: 1 1 600px; /* Large charts take up 600px width or more */
+    max-width: 100%; /* Prevent overflow */
+}
+
+.chart &.pie {
+    flex: 1 1 300px; /* Small charts take up 300px width or more */
+    max-width: 100%; /* Prevent overflow */
+}
+
+</style>
+
+<section class="dashboard">
+  <h1>CSV Validation Dashboard</h1>
+  <p>Explore validation reports, error types, and schema usage with interactive linked charts.</p>
+
+  <!-- Total Validations Count -->
+  <div id="total-validations">
+    <h2>Total Validations in View: <span id="validation-count">0</span></h2>
+  </div>
+
+  <!-- Reset Filters Button -->
+  <button id="reset-filters">Reset Filters</button>
+  <div id="charts" class="chart-flex">
+    <div id="chart-validations-by-month" class="chart bar">
+      <h3>Validations by Month</h3>
+      <div id="validations-by-month-chart"></div>
+    </div>
+    <div id="chart-validation-type" class="chart pie">
+      <h3>Validation Type</h3>
+      <div id="validation-type-chart"></div>
+    </div>
+    <div id="chart-schema-usage" class="chart pie">
+      <h3>Schema Usage</h3>
+      <div id="schema-usage-chart"></div>
+    </div>
+    <div id="chart-validation-state" class="chart pie">
+      <h3>Validation State</h3>
+      <div id="validation-state-chart"></div>
+    </div>
+    <div id="chart-error-types" class="chart bar">
+      <h3>Error Types</h3>
+      <div id="error-types-chart"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', async function () {
+    try {
+      // Define a custom color scale with #072589 as the primary color
+      const customColorsPie = d3.scaleOrdinal()
+        .range(['#072589', '#F467C0', '#33FF57', '#3357FF', '#F1C40F']);
+      const customColorsBar = d3.scaleOrdinal()
+        .range(['#072589']);
+
+      // Fetch the validation data
+      const response = await fetch('/dashboard-data');
+      const rawData = await response.json();
+
+      // Crossfilter initialization
+      const ndx = crossfilter(rawData);
+
+      const formatDateToMonth = date => {
+        const d = new Date(date);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      };
+
+      // Dimensions
+      const monthDimension = ndx.dimension(d => formatDateToMonth(d.createdAt));
+      const schemaDimension = ndx.dimension(d => d.validation.schemaPresent ? 'With Schema' : 'Without Schema');
+      const validDimension = ndx.dimension(d => d.validation.valid ? 'Valid' : 'Invalid');
+      const typeDimension = ndx.dimension(d => d.validation.type);
+
+      // Groups
+      const validationsByMonthGroup = monthDimension.group();
+      const schemaUsage = schemaDimension.group();
+      const validationState = validDimension.group();
+      const typeGroup = typeDimension.group();
+
+      // Special handling for error types
+      const errorTypeToRecordsMap = {};
+
+      const errorTypeDimension = ndx.dimension(d => {
+        const errors = d.validation.errors || [];
+        if (errors.length > 0) {
+          errors.forEach(error => {
+            if (!errorTypeToRecordsMap[error.type]) {
+              errorTypeToRecordsMap[error.type] = [];
+            }
+            errorTypeToRecordsMap[error.type].push(d);
+          });
+          return errors.map(error => error.type);
+        } else {
+          if (!errorTypeToRecordsMap["No Errors"]) {
+            errorTypeToRecordsMap["No Errors"] = [];
+          }
+          errorTypeToRecordsMap["No Errors"].push(d);
+          return ["No Errors"];
+        }
+      });
+
+      const errorTypeGroup = {
+        all: () => {
+          const flattenedErrors = {};
+          errorTypeDimension.top(Infinity).forEach(record => {
+            const errors = record.validation.errors || [];
+            if (errors.length > 0) {
+              errors.forEach(error => {
+                flattenedErrors[error.type] = (flattenedErrors[error.type] || 0) + 1;
+              });
+            } else {
+              flattenedErrors["No Errors"] = (flattenedErrors["No Errors"] || 0) + 1;
+            }
+          });
+          return Object.entries(flattenedErrors).map(([key, value]) => ({ key, value }));
+        },
+      };
+
+      // Charts
+      const validationsByMonthChart = dc.barChart('#validations-by-month-chart');
+      const validationTypeChart = dc.pieChart('#validation-type-chart');
+      const schemaUsageChart = dc.pieChart('#schema-usage-chart');
+      const validationStateChart = dc.pieChart('#validation-state-chart');
+      const errorTypesChart = dc.rowChart('#error-types-chart');
+
+      // Total Validations Counter
+      const all = ndx.groupAll();
+      const updateTotalCount = () => {
+        document.getElementById('validation-count').textContent = all.value();
+      };
+
+      // Validations by Month Chart
+      validationsByMonthChart
+        .width(600)
+        .height(300)
+        .dimension(monthDimension)
+        .group(validationsByMonthGroup)
+        .x(d3.scaleBand().domain(validationsByMonthGroup.all().map(d => d.key)))
+        .xUnits(dc.units.ordinal)
+        .colors(customColorsBar)
+        .colorAccessor((d, i) => i) // Ensures it starts from the first color
+        .elasticY(true)
+        .renderHorizontalGridLines(true)
+        .brushOn(true) // Enable range selection
+        .on('filtered', updateTotalCount)
+        .render();
+
+      // Validation Type Pie Chart
+      validationTypeChart
+        .width(300)
+        .height(300)
+        .dimension(typeDimension)
+        .group(typeGroup)
+        .colors(customColorsPie) // Apply custom colors
+        .colorAccessor((d, i) => i) // Ensures it starts from the first color
+        .innerRadius(50)
+        .on('filtered', updateTotalCount)
+        .render();
+
+      // Schema Usage Pie Chart
+      schemaUsageChart
+        .width(300)
+        .height(300)
+        .dimension(schemaDimension)
+        .colors(customColorsPie)
+        .colorAccessor((d, i) => i) // Ensures it starts from the first color
+        .group(schemaUsage)
+        .innerRadius(50)
+        .on('filtered', updateTotalCount)
+        .render();
+
+      // Validation State Pie Chart
+      validationStateChart
+        .width(300)
+        .height(300)
+        .dimension(validDimension)
+        .colors(customColorsPie)
+        .colorAccessor((d, i) => i) // Ensures it starts from the first color
+        .group(validationState)
+        .innerRadius(50)
+        .on('filtered', updateTotalCount)
+        .render();
+
+      // Error Types Row Chart
+      errorTypesChart
+        .width(600)
+        .height(300)
+        .dimension(errorTypeDimension)
+        .colors(customColorsBar)
+        .colorAccessor((d, i) => i) // Ensures it starts from the first color
+        .group(errorTypeGroup)
+        .elasticX(true)
+        .on('filtered', chart => {
+          const selectedKeys = chart.filters();
+
+          if (selectedKeys.length > 0) {
+            // Retrieve all records for the selected error types
+            const filteredRecords = selectedKeys
+              .map(key => errorTypeToRecordsMap[key] || [])
+              .flat();
+
+            // Filter the main crossfilter dimension to include only these records
+            ndx.dimension(() => true).filter(record =>
+              filteredRecords.includes(record)
+            );
+          } else {
+            // Clear the filter if no error type is selected
+            ndx.dimension(() => true).filterAll();
+          }
+
+          // Redraw all charts to reflect the new filter state
+          dc.redrawAll();
+        })
+        .xAxis().ticks(4);
+
+      // Render all charts
+      dc.renderAll();
+      updateTotalCount();
+
+      // Reset Filters Button
+      document.getElementById('reset-filters').addEventListener('click', () => {
+        dc.filterAll();
+        dc.redrawAll();
+        updateTotalCount(); // Reset total count
+      });
+    } catch (err) {
+      console.error('Error loading dashboard data:', err);
+    }
+  });
+</script>
+
+<%- include('./partials/footer') %>

@@ -1,4 +1,5 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const crypto = require('crypto');
 const axios = require('axios');
 const multer = require('multer');
@@ -8,6 +9,7 @@ const path = require('path');
 const messages = require('./lang/en.json');
 const cors = require('cors');
 const ValidationReport = require('./models/ValidationReport'); // Import the model
+const { URL } = require('url');
 
 // Load environment variables securely
 require("dotenv").config({ path: "./config.env" });
@@ -46,6 +48,38 @@ function generateTempFileName(prefix, extension) {
   const uniqueId = crypto.randomBytes(8).toString('hex');
   return path.join(__dirname, 'uploads', `${prefix}_${uniqueId}.${extension}`);
 }
+
+// Define rate limiting settings
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  message: { error: "Too many requests from this IP, please try again after 15 minutes." },
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  handler: (req, res, next, options) => {
+    // Debug output when the limit is exceeded
+    if (req.rateLimit.remaining === 0) {
+      console.log(`Rate limit exceeded: IP ${req.ip} - Time: ${new Date().toISOString()}`);
+    }
+
+    // Send the rate-limit message
+    res.status(options.statusCode).send(options.message);
+  }
+});
+
+// Middleware to conditionally apply rate limiting
+const conditionalRateLimit = (req, res, next) => {
+  const csvUrl = req.query.csvUrl || '';
+
+  // Check if the csvUrl starts with 'https://csvlint.io'
+  if (!csvUrl.startsWith('https://csvlint.io')) {
+    // Apply the rate limiter
+    limiter(req, res, next);
+  } else {
+    // Skip rate limiting and proceed
+    next();
+  }
+};
 
 // Set view engine to EJS
 app.set('view engine', 'ejs');
@@ -93,6 +127,10 @@ app.get('/api', (req, res) => {
   res.render('api');
 });
 
+app.get('/dashboard', (req, res) => {
+  res.render('dashboard');
+});
+
 app.get('/about', (req, res) => {
   res.render('about');
 });
@@ -131,11 +169,50 @@ app.get('/validation/:id', async (req, res) => {
   }
 });
 
-app.get('/validate', async (req, res) => {
+app.get('/dashboard-data', async (req, res) => {
+  try {
+    // Query to filter documents where "validation.type" is set
+    const reports = await ValidationReport.find(
+      { "validation.type": { $exists: true } }, // Ensure "validation.type" exists
+      {
+        _id: 0,
+        createdAt: 1,
+        validationCount: 1,
+        "validation.sourcePresent": 1,
+        "validation.schemaPresent": 1,
+        "validation.valid": 1,
+        "validation.type": 1, // Include validation.type in the projection
+        "validation.errors.type": 1,
+        "validation.errors.category": 1
+      }
+    );
+
+    res.json(reports);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch dashboard data' });
+  }
+});
+
+// Helper function to extract the domain from a URL
+function extractDomain(url) {
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.hostname; // Returns the domain (e.g., "example.com")
+  } catch (error) {
+    return null; // Return null if parsing fails
+  }
+}
+
+app.get('/validate', conditionalRateLimit, async (req, res) => {
   let csvPath, schemaPath;
   try {
     const csvUrl = req.query.csvUrl || '';
     const schemaUrl = req.query.schemaUrl || '';
+    // Extract domains if URLs are provided
+    const sourceDomain = csvUrl ? extractDomain(csvUrl) : null;
+    const schemaDomain = schemaUrl ? extractDomain(schemaUrl) : null;
+
     const format = req.query.format; // Get the desired format (svg or png)
 
     // Generate the hash
@@ -190,6 +267,9 @@ app.get('/validate', async (req, res) => {
       csvUrl,
       schemaUrl
     );
+    validationDataForStorage.sourceDomain = sourceDomain;
+    validationDataForStorage.schemaDomain = schemaDomain;
+    validationDataForStorage.validation.type = 'url';
     validationDataForStorage.hash = hash; // Add the hash
 
     // Use findOneAndUpdate to upsert the validation report and increment validationCount
@@ -256,7 +336,7 @@ app.get('/validate', async (req, res) => {
 
 
 // Route to handle CSV file upload and validation
-app.post('/validate', (req, res, next) => {
+app.post('/validate', limiter, (req, res, next) => {
   upload.fields([{ name: 'file' }, { name: 'schema' }])(req, res, (err) => {
     if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({ error: 'File size exceeds the allowed limit of 10mb' });
@@ -275,6 +355,12 @@ app.post('/validate', (req, res, next) => {
       const isCsvUrl = Boolean(req.body.csvUrl);
       const isSchemaUrl = Boolean(req.body.schemaUrl);
 
+      // Extract domains if URLs are provided
+      const sourceDomain = isCsvUrl ? extractDomain(req.body.csvUrl) : null;
+      const schemaDomain = isSchemaUrl ? extractDomain(req.body.schemaUrl) : null;
+      // Determine the type of validation
+      const validationType = isCsvUrl ? 'url' : 'file';
+
       if (isCsvUrl) {
         const lengthResponse = await axios.head(req.body.csvUrl);
         const contentLength = parseInt(lengthResponse.headers['content-length'], 10);
@@ -284,8 +370,11 @@ app.post('/validate', (req, res, next) => {
         }
         form.append('csvUrl', req.body.csvUrl);
       } else if (req.files.file) {
-        form.append('file', fs.createReadStream(req.files.file[0].path));
         csvPath = req.files.file[0].path;
+        form.append('file', fs.createReadStream(csvPath));
+
+        // Generate hash from file contents
+        hash = await generateFileHash(csvPath);
       }
 
       if (isSchemaUrl) {
@@ -341,11 +430,12 @@ app.post('/validate', (req, res, next) => {
       );
 
       // Set the hash in the validation data if it was generated
-      if (hash) {
-        validationDataForStorage.hash = hash;
-      } else {
-        validationDataForStorage.hash = `placeholder_${new mongoose.Types.ObjectId().toHexString()}`;
+      validationDataForStorage.hash = hash;
+      if (isCsvUrl) {
+        validationDataForStorage.sourceDomain = sourceDomain;
+        validationDataForStorage.schemaDomain = schemaDomain;
       }
+      validationDataForStorage.validation.type = validationType;
 
       // Use findOneAndUpdate if the hash is generated to prevent duplicate entries
       const query = hash ? { hash } : { _id: new mongoose.Types.ObjectId() };
@@ -512,6 +602,17 @@ function generateHash(csvUrl, schemaUrl) {
   return hmac.digest('hex');
 }
 
+// Function to generate hash from file contents
+async function generateFileHash(filePath) {
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash('sha256');
+    const stream = fs.createReadStream(filePath);
+
+    stream.on('data', (chunk) => hash.update(chunk));
+    stream.on('end', () => resolve(hash.digest('hex')));
+    stream.on('error', (err) => reject(err));
+  });
+}
 
 // Start server
 app.listen(port , () => console.log('App listening on port ' + port));

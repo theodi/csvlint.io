@@ -10,8 +10,8 @@
   <p>In order for the service to function we must temporarily store the data you submit:</p>
 
   <ul>
-    <li><strong>If you submit a URL for validation:</strong> We use a one-way hash to identify duplicate validations and ensure privacy. The actual URL is not stored, only a unique hash based on the URL and schema combination (if provided). This allows us to recognise repeat requests without retaining the original URLs.</li>
-    <li><strong>If you upload a file for validation:</strong> The file data is stored temporarily to perform the validation process and is deleted immediately after the validation completes. No CSV content or schema content is retained after validation.</li>
+    <li><strong>If you submit a URL for validation:</strong> We use a one-way hash to identify duplicate validations and ensure privacy. The exact URL is not stored, only the top level domain where the csv and schema files are located. We also generate a unique hash based on the URL and schema combination (if provided). This allows us to recognise repeat requests without retaining the original URLs.</li>
+    <li><strong>If you upload a file for validation:</strong> The file data is stored temporarily to perform the validation process and is deleted immediately after the validation completes. We generate a hash of the file contents to detect duplication validations of the exact same file. No CSV content or schema content is retained after validation.</li>
   </ul>
 
   <p><strong>Note:</strong> Because the validation results are stored without URLs or CSV content, it is not possible to rerun a validation using the validation ID, you must re-run the validation either via the web interface or API. This preserves your privacy while allowing us to keep records of validation counts and summaries.</p>

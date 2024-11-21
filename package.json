@@ -1,6 +1,6 @@
 {
   "name": "csvlint-client",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -14,6 +14,7 @@
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.21.1",
+    "express-rate-limit": "^7.4.1",
     "form-data": "^4.0.1",
     "mongoose": "^8.8.0",
     "multer": "^1.4.5-lts.1"

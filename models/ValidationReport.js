@@ -15,10 +15,13 @@ const validationReportSchema = new mongoose.Schema(
     version: { type: String },
     licence: { type: String },
     hash: { type: String, unique: true },
+    sourceDomain: { type: String },
+    schemaDomain: { type: String },
     validationCount: { type: Number, default: 1 }, // Initialize validationCount
     validation: {
       sourcePresent: { type: Boolean },
       schemaPresent: { type: Boolean },
+      type: { type: String },
       valid: { type: Boolean },
       errors: [validationEntrySchema],
       warnings: [validationEntrySchema],
