@@ -14,7 +14,7 @@ const validationReportSchema = new mongoose.Schema(
   {
     version: { type: String },
     licence: { type: String },
-    hash: { type: String, unique: true },
+    hash: { type: String },
     sourceDomain: { type: String },
     schemaDomain: { type: String },
     validationCount: { type: Number, default: 1 }, // Initialize validationCount
