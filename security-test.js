@@ -15,6 +15,8 @@ const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
 const path = require('path');
+// Load environment variables securely
+require("dotenv").config({ path: "./config.env" });
 
 const BASE_URL = process.env.TEST_URL || 'http://localhost:3080';
 
