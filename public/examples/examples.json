@@ -3,7 +3,7 @@
       "title": "Student List",
       "description": "A simple CSV file containing a list of students with their names and ages.",
       "expectedResult": "This CSV should validate successfully without errors or warnings.",
-      "csvUrl": "https://csvlint.io/examples/students_perfect.csv",
+      "csvUrl": "/examples/students_perfect.csv",
       "dialect": "",
       "schemaUrl": ""
     },
@@ -11,7 +11,7 @@
       "title": "Mixed types",
       "description": "A simple CSV file containing a list of students with their names and ages.",
       "expectedResult": "This CSV should produce warnings due to data inconsistencies in the age column.",
-      "csvUrl": "https://csvlint.io/examples/students_warnings.csv",
+      "csvUrl": "/examples/students_warnings.csv",
       "dialect": "",
       "schemaUrl": ""
     },
@@ -19,7 +19,7 @@
         "title": "Pipe Separator",
         "description": "A simple CSV file containing a list of students with their names and ages.",
         "expectedResult": "This CSV is valid but the separator is a pipe character.",
-        "csvUrl": "https://csvlint.io/examples/students_pipe.txt",
+        "csvUrl": "/examples/students_pipe.txt",
         "dialect": "delimiter=|",
         "schemaUrl": ""
     },
@@ -27,8 +27,8 @@
         "title": "Schema validation",
         "description": "Same file as in the first example, but this time the schema will throw errors.",
         "expectedResult": "This CSV should be invalid based upon the schema.",
-        "csvUrl": "https://csvlint.io/examples/students_perfect.csv",
+        "csvUrl": "/examples/students_perfect.csv",
         "dialect": "",
-        "schemaUrl": "https://csvlint.io/examples/studentsSchema.json"
+        "schemaUrl": "/examples/studentsSchema.json"
     }
   ]

@@ -1,123 +1,185 @@
-# CSVLint
+# CSVLint.io
 
-CSVLint is an online validation tool for CSV files. It validates CSV files for conformity to standards, checks for missing or malformed data, and can validate against both [CSV on the Web (CSVW)](https://www.w3.org/TR/tabular-data-model/) and [Data Package](https://specs.frictionlessdata.io/data-package/) schema standards. CSVLint is developed and maintained by an open-source community, with hosting provided by the Open Data Institute (ODI).
+CSVLint is an online validation tool for CSV files. It validates CSV files for conformity to standards, checks for missing or malformed data, and can validate against both [CSV on the Web (CSVW)](https://www.w3.org/TR/tabular-data-model/) and [Data Package](https://specs.frictionlessdata.io/data-package/) schema standards. CSVLint is developed and maintained by the [Open Data Institute](https://theodi.org).
 
 ## Features
 
-- **Structure Validation**: Checks CSV files for structural issues, such as inconsistent row lengths, incorrect quoting, and malformed line endings.
+- **CSV Structure Validation**: Checks CSV files for proper formatting, delimiters, and structural integrity.
 - **Schema Validation**: Validates CSV data against specified schemas, including CSVW and Data Package standards, to ensure that data formats, types, and constraints are met.
-- **Dialect Options**: Provides flexible dialect options for delimiters, quoting characters, line terminators, and other CSV parsing configurations.
+- **Error Reporting**: Provides detailed error messages and warnings to help users identify and fix issues in their CSV files.
 - **URL and File Upload Validation**: Validates CSV files available via URL or directly uploaded.
-- **Detailed Reporting**: Returns detailed feedback on validation results, including errors, warnings, and informational messages.
+- **Dialect Support**: Supports various CSV dialects and formatting options.
 - **Privacy-Focused**: Does not store URLs or CSV content after validation. Instead, a one-way hash of URLs is stored to identify previously validated URLs without retaining identifiable data.
 
-## Getting Started
+## Security Features
 
-### Prerequisites
+This application includes comprehensive security measures to protect against:
 
-Ensure that you have the following installed on your system:
+- **File Upload Attacks**: Server-side file type validation, MIME type checking, and size limits
+- **SSRF Protection**: URL validation that blocks dangerous protocols and private IP ranges
+- **XSS Prevention**: Input sanitization and Content Security Policy headers
+- **Rate Limiting**: IP-based rate limiting to prevent abuse
+- **Security Headers**: Comprehensive security headers via Helmet.js
+- **Input Validation**: All user inputs are validated and sanitized
 
-- **Node.js** (version 14+ recommended)
-- **MongoDB** (for storing validation reports)
-- **[csvlint-api](https://github.com/theodi/csvlint-api)** (backend service to talk with the `csvlint` validation ruby gem)
+For detailed security information, see [SECURITY.md](SECURITY.md).
 
-### Installation
+## Installation
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/theodi/csvlint.io
-   cd csvlint
-   ```
+1. Clone the repository:
+```bash
+git clone https://github.com/your-repo/csvlint.io.git
+cd csvlint.io
+```
 
-2. **Install Node.js dependencies**:
-   ```bash
-   npm install
-   ```
+2. Install dependencies:
+```bash
+npm install
+```
 
-3. **Install CSVLint API**:
-   Refer to documentation [here](https://github.com/theodi/csvlint-api)
+3. Create a configuration file:
+```bash
+cp config.env.example config.env
+```
 
-4. **Set up environment variables**:
-   Copy `.env.example` to `.env` and set up the environment variables. Key variables include:
-   - `PORT`: Port on which the server will run.
-   - `MONGO_URI`: MongoDB URI for storing validation reports.
-   - `CSVLINT_API`: URL for the CSVLint Ruby server (e.g., `http://localhost:4567/validate`).
-   - `HOST`: Base URL for accessing the validation service (e.g., `https://csvlint.io`).
+4. Edit `config.env` with your settings:
+```env
+# Server config
+PORT=3080
+HOST=http://localhost:3080
 
-5. **Start the Node.js server**:
-   ```bash
-   npm start
-   ```
+# MONGO DB config
+MONGO_URI=mongodb://localhost:27017/csvlint
+MONGO_DB=csvlint
 
-### Usage
+# Wrapper location for CSVLint.rb gem
+CSVLINT_API = http://localhost:4567/validate
 
-#### Web Interface
+# Security Configuration
+ALLOWED_ORIGINS=http://localhost:3080,https://csvlint.io
+HASH_SECRET=your_secure_random_secret_key_here
+```
 
-Access the web interface by navigating to `https://csvlint.io` (or your configured `HOST` and `PORT`).
+5. Start the application:
+```bash
+npm start
+```
 
-#### API
+## Security Testing
+
+Run the security test suite to verify all security measures are working:
+
+```bash
+npm run security-test
+```
+
+This will test:
+- Security headers
+- File upload validation
+- URL validation
+- Rate limiting
+- Input sanitization
+- MongoDB ID validation
+
+## API Usage
 
 The CSVLint API can be used programmatically to validate CSV files via URLs or direct file uploads.
+
+### Endpoints
 
 - **POST /validate**: Validates a CSV file from a URL or uploaded file.
 - **GET /validate**: Validates a CSV from a URL and returns either a badge or JSON report based on `format` and `accept` headers.
 
-Examples of API usage can be found in the [API Documentation](#api-documentation).
-
-### API Documentation
-
-#### Endpoint
-
-- `POST /validate`: Validates a CSV file or URL.
-- `GET /validate`: Validates a CSV file from a URL and can return a validation badge.
-
-#### Parameters
+### Parameters
 
 - **csvUrl** (string): URL to the CSV file to validate.
 - **schemaUrl** (string): URL to a JSON schema for validation (optional).
 - **file** (file): CSV file upload (optional, if `csvUrl` is provided).
 - **schema** (file): JSON schema file upload (optional).
-- **dialect options**: Optional CSV dialect options, such as `delimiter`, `lineTerminator`, and `quoteChar`.
 
-#### Responses
+### Example Usage
+
+```bash
+# Validate a CSV from URL
+curl -X POST http://csvlint.io/validate \
+  -H "Accept: application/json" \
+  -F "csvUrl=http://example.com/mydata.csv" \
+  -F "schemaUrl=http://example.com/myschema.json"
+
+# Upload a CSV file
+curl -X POST http://csvlint.io/validate \
+  -H "Accept: application/json" \
+  -F "file=@/path/to/yourfile.csv" \
+  -F "schema=@/path/to/yourschema.json"
+```
+
+## Response Format
 
 The API can return a JSON response or validation badge depending on the `format` query parameter or `accept` header.
 
-Example of a validation report JSON:
+### JSON Response Example
+
 ```json
 {
+  "id": "507f1f77bcf86cd799439011",
   "version": "0.2",
   "licence": "http://opendatacommons.org/licenses/odbl/",
   "validation": {
     "source": "http://example.com/mydata.csv",
     "schema": "http://example.com/myschema.json",
-    "state": "invalid",
-    "errors": [{ "type": "undeclared_header", "category": "structure" }]
+    "valid": true,
+    "errors": [],
+    "warnings": [],
+    "info": []
   }
 }
 ```
 
-### Example Badge Embed Code
+### Badge Integration
 
-To embed a validation badge for a CSV, you can use the following HTML:
+You can embed validation badges on your website:
+
 ```html
 <a href="https://csvlint.io/validate?csvUrl=http://example.com/mydata.csv">
   <img src="https://csvlint.io/validate?csvUrl=http://example.com/mydata.csv&format=svg" alt="Validation Badge">
 </a>
 ```
 
-## Privacy Policy
+## Privacy and Data Retention
 
-This service is privacy-focused and removes any identifiable information from validation reports. To view a detailed privacy policy, see [Privacy Policy](https://csvlint.io/privacy).
+- **File Uploads**: Files are deleted immediately after validation
+- **URL Privacy**: URLs are hashed and not stored in plain text
+- **No Content Storage**: File contents are never stored
+- **Validation Reports**: Only anonymized validation results are retained
+
+## Security Considerations
+
+- All file uploads are validated for type and size
+- URLs are validated to prevent SSRF attacks
+- Input sanitization prevents XSS attacks
+- Rate limiting prevents abuse
+- Security headers protect against various attacks
+
+For detailed security information, see [SECURITY.md](SECURITY.md).
 
 ## Contributing
 
-We welcome contributions! Please follow these steps:
-
-1. Fork the repository.
-2. Create a new branch for your feature.
-3. Submit a pull request for review.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run security tests: `npm run security-test`
+5. Submit a pull request
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the ISC License.
+
+## Support
+
+For support and questions:
+- Email: support@csvlint.io
+- GitHub Issues: [Repository Issues](https://github.com/your-repo/issues)
+
+For security issues:
+- Email: security@csvlint.io
+- Please include "SECURITY" in the subject line

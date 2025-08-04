@@ -112,15 +112,6 @@
 
   <button type="button" onclick="window.location.href='/'" style="width: 100%; margin-top: 1em;">Validate another CSV</button>
 </section>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const section = document.querySelector("section.white.main");
-    const id = section.getAttribute("data-id");
-    if (id) {
-      const newUrl = `/validation/${id}`;
-      history.pushState({ path: newUrl }, '', newUrl);
-    }
-  });
-</script>
+<script src="/js/result.js"></script>
 
 <%- include('./partials/footer') %>

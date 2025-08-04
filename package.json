@@ -1,10 +1,23 @@
 {
   "name": "csvlint-client",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "security-test": "node security-test.js",
+    "test-all": "node security-test.js",
+    "test-headers": "node security-test.js headers",
+    "test-file-upload": "node security-test.js file-upload",
+    "test-url-validation": "node security-test.js url-validation",
+    "test-rate-limiting": "node security-test.js rate-limiting",
+    "test-localhost-exemption": "node security-test.js localhost-exemption",
+    "test-input-sanitization": "node security-test.js input-sanitization",
+    "test-mongo-id": "node security-test.js mongo-id",
+    "test-cors": "node security-test.js cors",
+    "test-examples": "node security-test.js examples",
+    "test-csv-url-validation": "node security-test.js csv-url-validation",
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
@@ -16,7 +29,9 @@
     "express": "^4.21.1",
     "express-rate-limit": "^7.4.1",
     "form-data": "^4.0.1",
+    "helmet": "^7.1.0",
     "mongoose": "^8.8.0",
-    "multer": "^1.4.5-lts.1"
+    "multer": "^1.4.5-lts.1",
+    "validator": "^13.11.0"
   }
 }

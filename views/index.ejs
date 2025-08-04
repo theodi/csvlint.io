@@ -24,7 +24,7 @@
           <input class="url" type="url" name="csvUrl" placeholder="Enter CSV URL" />
           <div class="or-divider">or</div>
           <label for="fileUploadCSV" class="btn">Upload CSV File</label>
-          <input type="file" name="file" accept=".csv" id="fileUploadCSV" class="file-input" onchange="updateFileName('fileUploadCSV', 'csvFileName')" />
+          <input type="file" name="file" accept=".csv" id="fileUploadCSV" class="file-input" />
           <span id="csvFileName" class="file-name"></span>
         </div>
         <br/>
@@ -35,11 +35,11 @@
           <input class="url" type="url" name="schemaUrl" placeholder="Enter Schema URL" />
           <div class="or-divider">or</div>
           <label for="fileUploadSchema" class="btn">Upload Schema File</label>
-          <input type="file" name="schema" accept=".json" id="fileUploadSchema" class="file-input" onchange="updateFileName('fileUploadSchema', 'schemaFileName')" />
+          <input type="file" name="schema" accept=".json" id="fileUploadSchema" class="file-input" />
           <span id="schemaFileName" class="file-name"></span>
         </div>
 
-        <button type="button" class="toggle-dialect-btn" onclick="toggleDialectOptions()">Show Dialect Options</button>
+        <button type="button" class="toggle-dialect-btn">Show Dialect Options</button>
         <div id="dialectOptions" class="dialect-options collapsed">
           <div class="dialect-option">
             <label for="delimiter">Delimiter</label>
@@ -99,25 +99,5 @@
 
   </div>
 </section>
-<script>
-  function toggleDialectOptions() {
-    const dialectOptions = document.getElementById("dialectOptions");
-    const toggleButton = document.querySelector(".toggle-dialect-btn");
-
-    dialectOptions.classList.toggle("collapsed");
-
-    if (dialectOptions.classList.contains("collapsed")) {
-      toggleButton.textContent = "Show Dialect Options";
-    } else {
-      toggleButton.textContent = "Hide Dialect Options";
-    }
-  }
-  function updateFileName(inputId, fileNameId) {
-    const input = document.getElementById(inputId);
-    const fileNameDisplay = document.getElementById(fileNameId);
-
-    // Display the selected file name, or reset if no file is selected
-    fileNameDisplay.textContent = input.files.length > 0 ? input.files[0].name : '';
-  }
-</script>
+<script src="/js/index.js"></script>
 <%- include('./partials/footer') %>
